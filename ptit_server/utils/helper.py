@@ -4,7 +4,7 @@ import json
 from typing import Dict
 import urllib.parse as urlparse
 from typing import Optional
-from models import CurrUserData
+from ptit_server.models import CurrUserData
 
 def encode_payload(payload: Dict) -> str:
     """Encode dict -> Base64 JSON string"""
@@ -28,6 +28,7 @@ def parse_curr_user(curr_user: str) -> Optional[CurrUserData]:
     try:
         decoded_url = urlparse.unquote(curr_user)
         data = decode_payload(decoded_url)
+        print("DEBUG CurrUser decoded:", data) 
         return CurrUserData(**data)
     except Exception as e:
         print("Error decode CurrUser:", e)

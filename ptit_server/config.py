@@ -13,8 +13,6 @@ class Config:
     def login_url(cls) -> str:
         return f"{cls.BASE_URL}/api/pn-signin"
 
-# Logging setup
-logging.basicConfig(
-    level=logging.DEBUG if Config.DEBUG else logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-)
+    @classmethod
+    def semester_url() -> str:
+        return "https://uis.ptithcm.edu.vn/api/sch/w-locdshockytkbuser"
