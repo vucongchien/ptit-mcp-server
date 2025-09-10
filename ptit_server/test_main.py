@@ -1,5 +1,5 @@
 import datetime
-from my_server.client.ptit_client import PtitClient
+from ptit_server.client.ptit_client import PtitClient
 
 # ======================
 # Schedule Tests

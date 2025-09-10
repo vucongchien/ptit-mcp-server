@@ -1,18 +1,18 @@
 import datetime
 from typing import Dict, Optional,List,Tuple
-from my_server.services.auth import login_ptit
-from my_server.services.schedule import (
+from ptit_server.services.auth import login_ptit
+from ptit_server.services.schedule import (
     get_schedule,
     get_schedule_for_day,
     get_schedule_for_week,
 )
-from my_server.services.notification import (
+from ptit_server.services.notification import (
     get_all_notifications,
     get_unread_notifications
     
 )
-from my_server.utils.formatter import format_schedule_day, format_schedule_week
-from my_server.models import ScheduleFullResponse, Notification
+from ptit_server.utils.formatter import format_schedule_day, format_schedule_week
+from ptit_server.models import ScheduleFullResponse, Notification
 
 
 

@@ -11,5 +11,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Chạy app
-CMD ["python", "-m", "my_server.main"]
+CMD ["python", "-m", "ptit_server.main"]
 

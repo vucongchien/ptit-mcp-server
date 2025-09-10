@@ -1,7 +1,7 @@
 import requests
 from typing import List, Dict
-from my_server.models import NotificationResponse, Notification
-from my_server.config import Config
+from ptit_server.models import NotificationResponse, Notification
+from ptit_server.config import Config
 
 BASE_URL = Config.notification_url()
 

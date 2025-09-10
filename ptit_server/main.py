@@ -1,6 +1,6 @@
 
 from fastmcp import FastMCP
-from my_server.client.ptit_client import PtitClient
+from ptit_server.client.ptit_client import PtitClient
 import datetime
 
 mcp = FastMCP("ptithcm-mcp")

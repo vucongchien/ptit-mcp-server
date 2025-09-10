@@ -3,9 +3,9 @@ import requests
 import urllib.parse as urlparse
 from typing import Dict
 
-from my_server.utils.helper import encode_payload_dict_to_base64, parse_curr_user_from_URLdecode_Base64_to_json
-from my_server.models import LoginResponse
-from my_server.config import Config
+from ptit_server.utils.helper import encode_payload_dict_to_base64, parse_curr_user_from_URLdecode_Base64_to_json
+from ptit_server.models import LoginResponse
+from ptit_server.config import Config
 
 BASE_URL = Config.login_url()
 

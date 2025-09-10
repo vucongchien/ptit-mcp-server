@@ -2,13 +2,13 @@
 from typing import Dict, Optional, Any, List
 import datetime
 import requests
-from my_server.models import (
+from ptit_server.models import (
     ScheduleFullResponse,
     ScheduleData,
     TietTrongNgay,
     ThoiKhoaBieuEntry,
 )
-from my_server.config import Config
+from ptit_server.config import Config
 import logging
 
 

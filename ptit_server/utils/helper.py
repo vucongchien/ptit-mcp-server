@@ -4,7 +4,7 @@ import json
 from typing import Dict
 import urllib.parse as urlparse
 from typing import Optional
-from my_server.models import CurrUserData
+from ptit_server.models import CurrUserData
 
 def encode_payload_dict_to_base64(payload: Dict) -> str:
     """Encode dict -> Base64 JSON string"""

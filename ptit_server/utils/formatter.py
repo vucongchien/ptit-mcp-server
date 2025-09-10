@@ -1,5 +1,5 @@
 from typing import List
-from my_server.models import ThoiKhoaBieuEntry
+from ptit_server.models import ThoiKhoaBieuEntry
 
 def format_schedule_day(list_tkb: List[ThoiKhoaBieuEntry]) -> str:
     """
