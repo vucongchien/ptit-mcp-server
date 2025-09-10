@@ -1,9 +1,10 @@
-#models.py
+# models.py
 from typing import Optional, Dict, Any, List
-from pydantic import BaseModel, Field, ValidationError
-from datetime import date
+from pydantic import BaseModel, Field, ConfigDict
+from datetime import date, datetime
 
-
+# -------------------
+# Cấu trúc dữ liệu trả về khi login
 class CurrUserData(BaseModel):
     IDUser: Optional[int]
     Session: Optional[int]
@@ -18,20 +19,26 @@ class CurrUserData(BaseModel):
     UserLevel: Optional[int]
     result: Optional[bool]
     code: Optional[int]
-    # có thể thêm field khác nếu UIS trả về
-    
-    class Config:
-        populate_by_name = True
+    # Có thể thêm field khác nếu UIS trả về
+
+    # Pydantic V2 config
+    model_config = ConfigDict(
+        extra="ignore",  # từ chối các field không khai báo
+        populate_by_name=True  # cho phép alias mapping
+    )
+
 
 class LoginResponse(BaseModel):
     status: str
     redirect_url: Optional[str] = None
     curr_user: Optional[str] = None
     access_token: Optional[str] = None
-    cookies: Optional[Dict] = None
+    cookies: Optional[Dict[str, Any]] = None
     code: Optional[int] = None
 
-    
+    model_config = ConfigDict(extra="ignore")
+
+
 # -------------------
 # Cấu trúc từng tiết học trong ngày
 class TietTrongNgay(BaseModel):
@@ -40,6 +47,8 @@ class TietTrongNgay(BaseModel):
     gio_ket_thuc: Optional[str] = ""
     so_phut: int
     nhhk: int
+
+    model_config = ConfigDict(extra="ignore")
 
 
 # -------------------
@@ -65,13 +74,15 @@ class ThoiKhoaBieuEntry(BaseModel):
     ma_phong: Optional[str] = None
     ma_co_so: Optional[str] = None
     is_day_bu: bool
-    ngay_hoc: str  # dạng "2025-08-11T00:00:00"
+    ngay_hoc: str  # ISO format: "YYYY-MM-DDTHH:MM:SS"
     tiet_bat_dau_kttc: Optional[str] = None
     id_tu_tao: Optional[str] = None
     is_file_bai_giang: Optional[bool] = None
     id_sinh_hoat: Optional[str] = None
     is_dang_duyet_nghi_day: Optional[bool] = None
     is_nghi_day: Optional[bool] = None
+
+    model_config = ConfigDict(extra="ignore")
 
 
 # -------------------
@@ -80,9 +91,11 @@ class TuanTKB(BaseModel):
     tuan_hoc_ky: int
     tuan_tuyet_doi: int
     thong_tin_tuan: str
-    ngay_bat_dau: str
-    ngay_ket_thuc: str
+    ngay_bat_dau: str  # ISO format
+    ngay_ket_thuc: str  # ISO format
     ds_thoi_khoa_bieu: List[ThoiKhoaBieuEntry]
+
+    model_config = ConfigDict(extra="ignore")
 
 
 # -------------------
@@ -93,6 +106,8 @@ class ScheduleData(BaseModel):
     ds_tiet_trong_ngay: List[TietTrongNgay]
     ds_tuan_tkb: List[TuanTKB]
 
+    model_config = ConfigDict(extra="ignore")
+
 
 # -------------------
 # Full API Response
@@ -100,3 +115,27 @@ class ScheduleFullResponse(BaseModel):
     status: str
     code: int
     data: Optional[ScheduleData] | str
+
+    model_config = ConfigDict(extra="ignore")
+
+
+# -------------------
+# Cấu trúc thông báo
+class Notification(BaseModel):
+    id: str
+    tieu_de: str
+    noi_dung: Optional[str] = None
+    ngay_gui: str  # ISO format
+    nguoi_gui: str
+    is_da_doc: bool
+
+    model_config = ConfigDict(extra="ignore")
+
+
+class NotificationResponse(BaseModel):
+    total_items: int
+    total_pages: int
+    notification: int
+    ds_thong_bao: List[Notification]
+
+    model_config = ConfigDict(extra="ignore")
