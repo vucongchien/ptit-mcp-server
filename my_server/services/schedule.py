@@ -1,18 +1,23 @@
-#ptit_server/services/schdule.py
+# ptit_server/services/schdule.py
 from typing import Dict, Optional, Any, List
 import datetime
 import requests
-from my_server.models import ScheduleFullResponse, ScheduleData, TietTrongNgay, ThoiKhoaBieuEntry
+from my_server.models import (
+    ScheduleFullResponse,
+    ScheduleData,
+    TietTrongNgay,
+    ThoiKhoaBieuEntry,
+)
 from my_server.config import Config
 import logging
 
 
-# SCHEDULE_URL = Config.schedule_url()
-HOCKY_URL="https://uis.ptithcm.edu.vn/api/sch/w-locdshockytkbuser"
-#DOITUONGTHOIKHOABIEU_URL="https://uis.ptithcm.edu.vn/api/sch/w-locdsdoituongthoikhoabieu"
-SCHEDULE_URL="https://uis.ptithcm.edu.vn/api/sch/w-locdstkbtuanusertheohocky"
+SCHEDULE_URL = Config.schedule_url()
+HOCKY_URL = Config.semester_url()
+# DOITUONGTHOIKHOABIEU_URL="https://uis.ptithcm.edu.vn/api/sch/w-locdsdoituongthoikhoabieu"
 
 logger = logging.getLogger(__name__)
+
 
 def get_hocky(access_token: str, cookies: Dict[str, str]):
     headers = {
@@ -20,37 +25,42 @@ def get_hocky(access_token: str, cookies: Dict[str, str]):
         "Accept": "application/json, text/plain, */*",
         "Content-Type": "application/json",
     }
-    
+
+    payload = {
+        "filter": {"is_tieng_anh": None},
+        "additional": {
+            "paging": {"limit": 100, "page": 1},
+            "ordering": [{"name": "hoc_ky", "order_type": 1}],
+        },
+    }
+
     resp_hocky = requests.post(
-            HOCKY_URL,
-            headers=headers,
-            cookies=cookies,
-            json={"filter": {"is_tieng_anh": None},
-                  "additional": {"paging": {"limit": 100, "page": 1},
-                                 "ordering": [{"name": "hoc_ky", "order_type": 1}]}}
+        HOCKY_URL, headers=headers, cookies=cookies, json=payload
     )
-    
+
     if resp_hocky.status_code != 200:
         logger.error(f"Failed to get semester data: {resp_hocky.status_code}")
         return None
-    
+
     try:
         hocky_data = resp_hocky.json()
         current_semester = hocky_data.get("data", {}).get("hoc_ky_theo_ngay_hien_tai")
-        
+
         if current_semester:
             logger.info(f"Found current semester: {current_semester}")
             return current_semester
-            
+
         # Fallback to first semester if current not found
         ds_hoc_ky = hocky_data.get("data", {}).get("ds_hoc_ky", [])
         if ds_hoc_ky:
             logger.warning("Current semester not found, using latest semester")
             return ds_hoc_ky[0]["hoc_ky"]
-            
+
         logger.error("No semester data found")
-        return ScheduleFullResponse(status="fail", code=404, data="Không tìm thấy học kỳ")
-        
+        return ScheduleFullResponse(
+            status="fail", code=404, data="Không tìm thấy học kỳ"
+        )
+
     except Exception as e:
         logger.error(f"Error parsing semester data: {e}")
         return None
@@ -88,13 +98,14 @@ def get_schedule(
 
     if resp.status_code == 200:
         try:
-            parsed_data = ScheduleData(**resp.json()["data"])            
+            parsed_data = ScheduleData(**resp.json()["data"])
             return ScheduleFullResponse(status="ok", code=200, data=parsed_data)
         except Exception as e:
             logger.error(f"Parse schedule error: {e}")
             return ScheduleFullResponse(status="fail", code=500, data=str(e))
 
     return ScheduleFullResponse(status="fail", code=resp.status_code, data=resp.text)
+
 
 def get_schedule_for_today(schedule: ScheduleFullResponse) -> List[ThoiKhoaBieuEntry]:
     """
@@ -122,7 +133,9 @@ def get_schedule_for_today(schedule: ScheduleFullResponse) -> List[ThoiKhoaBieuE
 # =========================
 # LẤY LỊCH THEO NGÀY/TUẦN
 # =========================
-def get_schedule_for_day(schedule: ScheduleFullResponse, date: datetime.date) -> List[ThoiKhoaBieuEntry]:
+def get_schedule_for_day(
+    schedule: ScheduleFullResponse, date: datetime.date
+) -> List[ThoiKhoaBieuEntry]:
     """
     Lấy lịch cho 1 ngày bất kỳ.
     """
@@ -142,7 +155,9 @@ def get_schedule_for_day(schedule: ScheduleFullResponse, date: datetime.date) ->
     return result
 
 
-def get_schedule_for_week(schedule: ScheduleFullResponse, date: datetime.date) -> List[ThoiKhoaBieuEntry]:
+def get_schedule_for_week(
+    schedule: ScheduleFullResponse, date: datetime.date
+) -> List[ThoiKhoaBieuEntry]:
     """
     Lấy lịch cho tuần chứa ngày bất kỳ.
     """
@@ -155,16 +170,18 @@ def get_schedule_for_week(schedule: ScheduleFullResponse, date: datetime.date) -
     for tuan in ds_tuan:
         try:
             # Use dot notation instead of dictionary access since tuan is a TuanTKB object
-            ngay_bat_dau = datetime.datetime.strptime(tuan.ngay_bat_dau, "%d/%m/%Y").date()
-            ngay_ket_thuc = datetime.datetime.strptime(tuan.ngay_ket_thuc, "%d/%m/%Y").date()
+            ngay_bat_dau = datetime.datetime.strptime(
+                tuan.ngay_bat_dau, "%d/%m/%Y"
+            ).date()
+            ngay_ket_thuc = datetime.datetime.strptime(
+                tuan.ngay_ket_thuc, "%d/%m/%Y"
+            ).date()
 
             if ngay_bat_dau <= date <= ngay_ket_thuc:
                 result.extend(tuan.ds_thoi_khoa_bieu)
-                
+
         except Exception as e:
             logger.error(f"Error processing week data: {e}")
             continue
 
     return result
-
-
