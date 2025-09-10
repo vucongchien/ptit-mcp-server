@@ -3,9 +3,9 @@ import requests
 import urllib.parse as urlparse
 from typing import Dict
 
-from ptit_server.utils.helper import encode_payload, parse_curr_user
-from ptit_server.models import LoginResponse
-from ptit_server.config import Config
+from my_server.utils.helper import encode_payload_dict_to_base64, parse_curr_user_from_URLdecode_Base64_to_json
+from my_server.models import LoginResponse
+from my_server.config import Config
 
 BASE_URL = Config.login_url()
 
@@ -19,7 +19,7 @@ def build_code(username: str, password: str) -> str:
         "password": password,
         "uri": "https://uis.ptithcm.edu.vn/#/home"
     }
-    return encode_payload(payload)
+    return encode_payload_dict_to_base64(payload)
 
 
 def login_ptit(username: str, password: str) -> LoginResponse:
@@ -56,7 +56,7 @@ def login_ptit(username: str, password: str) -> LoginResponse:
 
         curr_user = fragment_query.get("/home?CurrUser", [None])[0]
         
-        access_token = parse_curr_user(curr_user).access_token if curr_user else None
+        access_token = parse_curr_user_from_URLdecode_Base64_to_json(curr_user).access_token if curr_user else None
 
 
         print("Access Token:", access_token)

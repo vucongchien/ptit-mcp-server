@@ -1,0 +1,10 @@
+services:
+  uis-mcp:
+    build: .
+    container_name: uis-mcp
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
